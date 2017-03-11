@@ -1,6 +1,6 @@
 {% load static %}
 <head>
-	<script type="text/javascript" src="{% static "chatio/chatio.js" %}"></script>
+	{% include "chatio/chatiosnippet.html" %}
 </head>
 
 <body>
@@ -8,7 +8,6 @@
 		{% for room in rooms %}
 			<li><button class="room-link" data-room-id="{{room.id}}">
 				{{room}}
-				
 			</button>
 		</li>
 		{% empty %}

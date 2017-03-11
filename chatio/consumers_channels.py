@@ -2,16 +2,30 @@ from channels import Channel
 from models import Message, Room
 from channels.auth import channel_session_user
 import json
+from settings import CHATIO_ALLOW_ROOM_CREATION
 
 
 def chat_create_room(chan_msg):
 	''' if the room doesn't exist create it. then pass the msg onto chat_join
 	'''
+
 	try:
+		# see if room exists
 		Room.objects.get(title=chan_msg['room'])
 	except Room.DoesNotExist:
-		Room.objects.create(title=chan_msg['room']).save()
-		print 'creating room %s'%chan_msg['room']
+		# if the setting don't allow clients to create chatrooms
+		if not CHATIO_ALLOW_ROOM_CREATION: 
+			chan_msg.reply_channel.send({
+				'text': json.dumps({
+					'err': ('clients not allowed to create chatrooms.'
+										'and room doesn not exist')
+				})
+			})
+			return
+		else:
+			# create the room
+			Room.objects.create(title=chan_msg['room']).save()
+			print 'creating room %s'%chan_msg['room']
 	finally:
 		chan_msg['command'] = 'join'
 		Channel('chat.receive').send(chan_msg.content)
