@@ -1,12 +1,9 @@
 {% load static %}
-<head>
-	{% include "chatio/chatiosnippet.html" %}
-</head>
 
 <body>
 	<ul>
 		{% for room in rooms %}
-			<li><button class="room-link" data-room-id="{{room.id}}">
+			<li><button class="room-link" data-room="{{room}}">
 				{{room}}
 			</button>
 		</li>
@@ -14,4 +11,16 @@
 			<p>No Chatrooms defined. Create some in the admin?</p>
 		{% endfor %}
 	</ul>
+
 </body>
+
+<footer>
+	{% include "chatio/chatiosnippet.html" %}
+	<script type="text/javascript">
+		var chat = new Chatio('/chat')
+		$('.room-link').click(function(){
+			chat.connect(this.dataset.room)
+		});
+	</script>
+	
+</footer>

@@ -27,7 +27,7 @@ class Room(models.Model):
 
 class Message(models.Model):
 	user = models.CharField(max_length=20)
-	Message = models.CharField(max_length=500)
+	message = models.CharField(max_length=500)
 	room = models.ForeignKey(Room)
 	created = models.DateTimeField(default=timezone.now)
 

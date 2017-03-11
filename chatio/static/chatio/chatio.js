@@ -1,8 +1,12 @@
 function Chatio(streamurl, onjoin, onleave, onmsg){
+	if(onjoin == undefined){onjoin = default_onjoin;}
+	if(onmsg == undefined){onjoin = default_onmsg;}
+	if(onleave == undefined){onjoin = default_onleave;}
+
 	this.ws_protocol = window.location.protocol == 'https:'? 'wss':'ws';
-	this.ws_path = ws_protocol + '://' + window.location.host + streamurl;
-	console.log('Connecting to ', ws_path);
-	this.socket = new ReconnectingWebSocket(ws_path);
+	this.ws_path = this.ws_protocol + '://' + window.location.host + streamurl;
+	console.log('Connecting to ', this.ws_path);
+	this.socket = new ReconnectingWebSocket(this.ws_path);
 
 	this.socket.onopen = function(){
 		console.log('socket connected');
@@ -30,6 +34,13 @@ function Chatio(streamurl, onjoin, onleave, onmsg){
 		}
 	}
 
+	this.createroom = function(room){
+		var data = {
+			room: room,
+			command: 'create'
+		}
+		this.socket.send(JSON.stringify(data));
+	}
 	// connect to a room
 	this.connect = function(room){
 		var data = {

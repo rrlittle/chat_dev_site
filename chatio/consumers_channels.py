@@ -41,21 +41,26 @@ def chat_join(chan_msg):
 
 	# notify the chatroom 	 
 	joinmsg = '%s joined the chatroom!'%username
+	print 'sending joinmsg', joinmsg
 	msg = Message.objects.create(
 		room=room,
 		message=joinmsg,
 		user=username
 	)
 	msg.save()
+	print 'sending join msg to the existing group'
 	msg.send_to_group()
 
 	# send the last 50 messages in reverse order
 	for oldmsg in room.last_n_rev(50):
+		print 'sending new user %s'%oldmsg
 		oldmsg.send_single(chan_msg.reply_channel)
 
 	# send the latest message last
+	print 'sending user user joined msg'
 	msg.send_single(chan_msg.reply_channel)
 
+	print 'finally adding user to the group'
 	# add this person to the group! so they will be updated for future messages
 	room.ws_group.add(chan_msg.reply_channel)
 
