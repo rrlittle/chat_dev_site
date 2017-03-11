@@ -31,8 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'chatio',
     'channels',
+    'chatio',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -120,3 +120,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# channels configuration
+CHANNEL_LAYERS = {
+    "default":{
+        "BACKEND": 'asgiref.inmemory.ChannelLayer',
+        "ROUTING": 'chat_dev_site.routing.channel_routing',
+    }
+
+}
