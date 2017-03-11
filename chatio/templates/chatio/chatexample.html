@@ -1,12 +1,15 @@
 {% load static %}
 
+<head>
+	<link href="{% static "chatio/example/favicon.ico" %}" rel="icon" type="image/x-icon" />
+</head>
+
 <body>
-	<ul>
+	<ul class="list-group">
 		{% for room in rooms %}
-			<li><button class="room-link" data-room="{{room}}">
-				{{room}}
-			</button>
-		</li>
+			<li class="list-group-item" id="roomgroup-{{room}}">
+				<button class="btn room-connect" id="roomgroupbtn-{{room}}" data-room="{{room}}">{{room}}</button>
+			</li>
 		{% empty %}
 			<p>No Chatrooms defined. Create some in the admin?</p>
 		{% endfor %}
@@ -15,12 +18,11 @@
 </body>
 
 <footer>
+
 	{% include "chatio/chatiosnippet.html" %}
-	<script type="text/javascript">
-		var chat = new Chatio('/chat')
-		$('.room-link').click(function(){
-			chat.connect(this.dataset.room)
-		});
-	</script>
+	<script type="text/javascript" src="{% static "chatio/example/bootstrap.min.js" %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static "chatio/example/bootstrap.min.css" %}">
+	<link rel="stylesheet" type="text/css" href="{% static "chatio/example/bootstrap-theme.min.css" %}">
+	<script type="text/javascript" src="{% static "chatio/example/chatexample.js" %}"></script>
 	
 </footer>

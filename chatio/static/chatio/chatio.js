@@ -1,7 +1,21 @@
+function default_onmsg(data){
+	console.log('received',data);
+}
+
+function default_onleave(data){
+	console.log('left', data);
+}
+
+function default_onjoin(data){
+	console.log('joined', data);
+}
+
+
+
 function Chatio(streamurl, onjoin, onleave, onmsg){
 	if(onjoin == undefined){onjoin = default_onjoin;}
-	if(onmsg == undefined){onjoin = default_onmsg;}
-	if(onleave == undefined){onjoin = default_onleave;}
+	if(onmsg == undefined){onmsg = default_onmsg;}
+	if(onleave == undefined){onleave = default_onleave;}
 
 	this.ws_protocol = window.location.protocol == 'https:'? 'wss':'ws';
 	this.ws_path = this.ws_protocol + '://' + window.location.host + streamurl;
@@ -16,7 +30,7 @@ function Chatio(streamurl, onjoin, onleave, onmsg){
 		console.log('socket isconnected');
 	}
 
-	this.socket.onmesssage = function(msg){
+	this.socket.onmessage = function (msg){
 		var data = JSON.parse(msg.data);
 		console.log('got a msg', data);
 	
@@ -28,7 +42,7 @@ function Chatio(streamurl, onjoin, onleave, onmsg){
 		else if(data.leave){ onleave(data); }
 		else if(data.message != undefined 
 			&& data.username != undefined 
-			&& data.created!= undefined){msgfunc(data);}
+			&& data.created!= undefined){onmsg(data);}
 		else{
 			console.log('could not process msg!');
 		}
@@ -42,7 +56,7 @@ function Chatio(streamurl, onjoin, onleave, onmsg){
 		this.socket.send(JSON.stringify(data));
 	}
 	// connect to a room
-	this.connect = function(room){
+	this.join = function(room){
 		var data = {
 			room: room,
 			command: 'join'
@@ -55,18 +69,14 @@ function Chatio(streamurl, onjoin, onleave, onmsg){
 			command: 'send',
 			room: room
 		}
-		socket.send(JSON.stringify(data));
+		this.socket.send(JSON.stringify(data));
 	}
-}
-
-function default_onmsg(data){
-	console.log('received',data);
-}
-
-function default_onleave(data){
-	console.log('left', data);
-}
-
-function default_onjoin(data){
-	console.log('joined', data);
+	// disconnect from a room
+	this.leave = function(room){
+		var data = {
+			room: room,
+			command: 'leave'
+		}
+		this.socket.send(JSON.stringify(data));
+	}
 }

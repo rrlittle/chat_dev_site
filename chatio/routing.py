@@ -12,5 +12,5 @@ channel_routes = [
 websocket_routes = [
 	route('websocket.connect', ws.ws_connect),
 	route('websocket.receive', ws.ws_receive),
-	# route('websocket.disconnect', ws.ws_disconnect),
+	route('websocket.disconnect', ws.ws_disconnect),
 ]
