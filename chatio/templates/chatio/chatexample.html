@@ -1,0 +1,18 @@
+{% load static %}
+<head>
+	<script type="text/javascript" src="{% static "chatio/chatio.js" %}"></script>
+</head>
+
+<body>
+	<ul>
+		{% for room in rooms %}
+			<li><button class="room-link" data-room-id="{{room.id}}">
+				{{room}}
+				
+			</button>
+		</li>
+		{% empty %}
+			<p>No Chatrooms defined. Create some in the admin?</p>
+		{% endfor %}
+	</ul>
+</body>
