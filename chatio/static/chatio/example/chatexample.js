@@ -35,6 +35,7 @@ function onleave(data){
 
 var chat = new Chatio('/chat', onjoin, onleave, onmsg);
 
+
 $('.room-connect').click(function(){
 	console.log('clicked', $(this).id);
 	$(this).prop('disabled', true);

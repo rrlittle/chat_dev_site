@@ -48,6 +48,7 @@ function Chatio(streamurl, onjoin, onleave, onmsg){
 		}
 	}
 
+	// crates a room
 	this.createroom = function(room){
 		var data = {
 			room: room,
@@ -63,6 +64,7 @@ function Chatio(streamurl, onjoin, onleave, onmsg){
 		}
 		this.socket.send(JSON.stringify(data));
 	}
+	// sends message to server
 	this.sendmsg = function(msg, room){
 		var data = {
 			message: msg,
@@ -78,5 +80,26 @@ function Chatio(streamurl, onjoin, onleave, onmsg){
 			command: 'leave'
 		}
 		this.socket.send(JSON.stringify(data));
+	}
+
+	///
+	this.addchatdom = function(div){
+		console.log('joined', data.join)
+		var roomdiv = $(
+				'<div class="room well" id="room-'+data.join+'"">' +
+					'<div id="messages-'+data.join+'"></div>' + 
+					'<input><button id="send-'+data.join+'">send</button>' +
+					'<button id="leave-'+data.join+'">leave</button>' +
+				'</div>'
+			);
+		roomdiv.find('#send-'+data.join).click(function(){
+			chat.sendmsg(roomdiv.find('input').val(), data.join);
+			roomdiv.find('input').val(''); //clear input
+			return false;  // don't refresh page
+		});
+		roomdiv.find('#leave-'+data.join).click(function(){
+			chat.leave(data.join);
+		});
+		div.append(roomdiv);
 	}
 }

@@ -27,10 +27,18 @@ def ws_receive(message):
 
 @channel_session
 def ws_disconnect(message):
-	print 'websocket disconnect'
+	print 'websocket disconnect, session had ', message.channel_session['rooms']
+
 	for room_id in message.channel_session['rooms']:
 		try:
 			room = Room.objects.get(pk=room_id)
-			room.ws_group.discard(message.reply_channel)
+			print 'trying to remove disconnecting user from ', room
+			payload = {
+				'reply_channel': message['reply_channel'],
+				'command': 'leave',
+				'room': room.title
+			}
+			Channel('chat.receive').send(payload)
 		except Room.DoesNotExist:
+			print 'room does not exist'
 			pass  # no group to remove them from

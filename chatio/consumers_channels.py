@@ -3,7 +3,7 @@ from models import Message, Room
 from channels.auth import channel_session_user
 import json
 from settings import CHATIO_ALLOW_ROOM_CREATION
-
+from time import sleep
 
 def chat_create_room(chan_msg):
 	''' if the room doesn't exist create it. then pass the msg onto chat_join
@@ -37,6 +37,7 @@ def chat_join(chan_msg):
 	'''
 	username = chan_msg.user.username
 	print '%s attempting joining room %s'%(username, chan_msg['room'])
+	print '%s is currently subscribed to these rooms %s'%(username, chan_msg.channel_session['rooms'])
 	room = Room.objects.get(title=chan_msg['room'])
 
 	# send a signal back to the joining guy, so that they can update ther UI
@@ -44,7 +45,23 @@ def chat_join(chan_msg):
 		'text': json.dumps({
 			'join': room.title
 		})
-	})
+	}, immediately=True)
+
+	# send the last 50 messages in reverse order
+	for oldmsg in room.last_n(50):
+		# import ipdb; ipdb.set_trace()
+		print 'sending new user %s'%oldmsg
+		oldmsg.send_single(chan_msg.reply_channel)
+		# sleep(1)
+
+	# add this person to the group! so they will be updated for future messages
+	if (room.id not in chan_msg.channel_session['rooms']):
+		print 'actually adding new user to the rooms ws_group'
+		room.ws_group.add(chan_msg.reply_channel)
+
+	# add this room to the channel_session rooms list
+	rooms = set(chan_msg.channel_session['rooms']).union([room.id])
+	chan_msg.channel_session['rooms'] = list(rooms)
 
 	# notify the chatroom 	 
 	joinmsg = '%s joined the chatroom!'%username
@@ -54,23 +71,11 @@ def chat_join(chan_msg):
 		user=username
 	)
 	msg.save()
+	print 'sending %s to group'%msg
 	msg.send_to_group()
 
-	# send the last 50 messages in reverse order
-	for oldmsg in room.last_n_rev(50):
-		print 'sending new user %s'%oldmsg
-		oldmsg.send_single(chan_msg.reply_channel)
 
-	# send the latest message last
-	# msg.send_single(chan_msg.reply_channel)
 
-	# add this person to the group! so they will be updated for future messages
-	if (room.id not in chan_msg.channel_session['rooms']):
-		room.ws_group.add(chan_msg.reply_channel)
-
-	# add this room to the channel_session rooms list
-	rooms = set(chan_msg.channel_session['rooms']).union([room.id])
-	chan_msg.channel_session['rooms'] = list(rooms)
 
 
 @channel_session_user
@@ -111,8 +116,9 @@ def chat_leave(chan_msg):
 		'text': json.dumps({
 			'leave': room.title
 		})
-	})
+	}, immediately=True)
 
+	print 'discarding reply channel from room'
 	# remove this person from the room's Group
 	room.ws_group.discard(chan_msg.reply_channel)
 

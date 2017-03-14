@@ -19,10 +19,7 @@ class Room(models.Model):
 
 	def last_n(self, n):
 		''' return the latest n messages mostrecent - oldest'''
-		return Message.objects.filter(room=self).order_by('created')[:n]
-
-	def last_n_rev(self, n):
-		return self.last_n(n).reverse()
+		return list(Message.objects.filter(room=self).order_by('created'))[-n:]
 
 
 class Message(models.Model):
@@ -40,7 +37,7 @@ class Message(models.Model):
 		}
 		self.room.ws_group.send({
 			'text': json.dumps(msg)
-		})
+		}, immediately=True)
 
 	def send_single(self, reply_channel):
 		msg = {
@@ -51,7 +48,7 @@ class Message(models.Model):
 		}
 		reply_channel.send({
 			'text': json.dumps(msg)
-		})
+		}, immediately=True)
 
 	def __str__(self):
 		return '[%s]%s:%s'%(str(self.room), self.user, self.message)
